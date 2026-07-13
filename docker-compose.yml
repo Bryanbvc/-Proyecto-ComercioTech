@@ -1,0 +1,49 @@
+# docker-compose.yml
+# Define el contenedor de MongoDB para el proyecto ComercioTech
+
+
+
+services:
+
+  mongodb:
+    # Imagen oficial de MongoDB Community Server
+    image: mongo:7.0
+
+    # Nombre del contenedor (para identificarlo fácilmente)
+    container_name: comerciotech-mongodb
+
+    # Reiniciar automáticamente si se detiene por error
+    restart: unless-stopped
+
+    # Variables de entorno para crear el usuario administrador
+    # Estas credenciales se leen desde el archivo .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+
+    # Mapeo de puertos: puerto_windows:puerto_contenedor
+    # 27017 es el puerto estándar de MongoDB
+    ports:
+      - "27017:27017"
+
+    # Volumen persistente: los datos no se pierden al detener el contenedor
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+
+    # Red interna para comunicación entre servicios
+    networks:
+      - comerciotech-network
+
+# Definición de volúmenes nombrados (Docker los gestiona automáticamente)
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+# Definición de la red
+networks:
+  comerciotech-network:
+    driver: bridge
